@@ -1,0 +1,10 @@
+type: google.api.Service
+config_version: 3
+
+http:
+  rules:
+    - selector: wizapp.items.v1.ItemService.Create
+      post: "/api/v1/items"
+      body: "*"
+    - selector: wizapp.items.v1.ItemService.Get
+      get: "/api/v1/items"

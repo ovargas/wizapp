@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package wizapp.items.v1;
+
+option go_package = "wizapp/api/items/v1;itemsV1";
+
+import "items/v1/models.proto";
+
+message CreateRequest {
+  string name = 1;
+}
+
+message GetRequest {
+  string id = 1;
+}
+
+service ItemService {
+  rpc Create(CreateRequest) returns(Item) {};
+  rpc Get(GetRequest) returns(Item) {}
+}

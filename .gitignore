@@ -1,0 +1,31 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+*.pdf
+
+# Test binary, built with
+*.test
+
+.coverage*
+coverage.*
+
+cmd/__debug_bin
+release/
+test-artifacts/
+result.json
+*report.json
+__debug_bin
+resources/bulk
+resources/prod.yaml
+
+.vscode/
+.idea/
+gosec.json
+
+.DS_Store
+scratchpad/
+*.env

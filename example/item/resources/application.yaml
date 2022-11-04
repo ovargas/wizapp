@@ -1,0 +1,16 @@
+
+grpc:
+  host: 0.0.0.0
+  port: 8088
+  gateway:
+    host: 0.0.0.0
+    port: 80
+
+datasource:
+  default:
+    connection_string: ${DB_USER:root}:${DB_PASSWORD:password}@tcp(${DB_HOST:localhost}:${DB_PORT:13306})/${DB_NAME:localdb}?multiStatements=true&parseTime=true
+    driver_name: mysql
+    migration_path: file://resources/db/migration/default
+    max_open_connections: 5
+    max_idle_connections: 3
+    max_connection_lifetime: 1h
