@@ -7,6 +7,7 @@ import (
 type (
 	Component interface {
 		Command() *Command
+		mustImplementComponent()
 	}
 
 	ComponentFactory func(config *ApplicationConfig) (Component, error)
@@ -25,4 +26,15 @@ func RegisterComponent(name string, factory ComponentFactory) {
 	}
 
 	componentFactories[name] = factory
+}
+
+type UnimplementedComponent struct{}
+
+func (u UnimplementedComponent) Command() *Command {
+	return nil
+}
+
+func (u UnimplementedComponent) mustImplementComponent() {
+	//TODO implement me
+	panic("implement me")
 }

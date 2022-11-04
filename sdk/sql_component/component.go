@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/ovargas/wizapp/sdk/app"
+	"github.com/ovargas/wizapp/sdk/datasource"
+	"github.com/ovargas/wizapp/sdk/logger"
 	"github.com/urfave/cli/v2"
-	"wizapp/sdk/app"
-	"wizapp/sdk/datasource"
-	"wizapp/sdk/logger"
 )
 
 const (
@@ -25,6 +25,7 @@ type (
 	}
 
 	component struct {
+		app.UnimplementedComponent
 		config map[string]Config
 	}
 )

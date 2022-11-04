@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/ovargas/wizapp/sdk/app"
+	"github.com/ovargas/wizapp/sdk/grpc_server"
+	"github.com/ovargas/wizapp/sdk/logger"
 	"google.golang.org/grpc"
 	"net/http"
-	"wizapp/sdk/app"
-	"wizapp/sdk/grpc_server"
-	"wizapp/sdk/logger"
 )
 
 var (
@@ -32,6 +32,7 @@ type (
 	}
 
 	server struct {
+		app.UnimplementedServer
 		server    *http.Server
 		isStarted bool
 	}

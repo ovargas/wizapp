@@ -2,12 +2,15 @@ package temporal_server
 
 import (
 	"context"
+	"github.com/ovargas/wizapp/sdk/app"
+	"github.com/ovargas/wizapp/sdk/logger"
 	"go.temporal.io/sdk/client"
+	"go.temporal.io/sdk/converter"
 	"go.temporal.io/sdk/interceptor"
+	temporal_log "go.temporal.io/sdk/log"
 	"go.temporal.io/sdk/worker"
+	"go.temporal.io/sdk/workflow"
 	"time"
-	"wizapp/sdk/app"
-	"wizapp/sdk/logger"
 )
 
 const (
@@ -20,6 +23,11 @@ var (
 	registry           func(w Worker)
 	onFatalError       func(error)
 	workerInterceptors []WorkerInterceptor
+	temporalLogger     Logger
+	metricHandler      MetricHandler
+	identity           string
+	dataConverter      DataConverter
+	contextPropagators []ContextPropagator
 )
 
 func init() {
@@ -27,9 +35,14 @@ func init() {
 }
 
 type (
+	MetricHandler     = client.MetricsHandler
 	WorkerInterceptor = interceptor.WorkerInterceptor
+	DataConverter     = converter.DataConverter
+	ContextPropagator = workflow.ContextPropagator
+	Logger            = temporal_log.Logger
 
 	server struct {
+		app.UnimplementedServer
 		worker    worker.Worker
 		isStarted bool
 	}
@@ -74,6 +87,26 @@ type (
 	}
 )
 
+func SetLogger(logger Logger) {
+	temporalLogger = logger
+}
+
+func SetMetricHandler(handler MetricHandler) {
+	metricHandler = handler
+}
+
+func SetIdentity(name string) {
+	identity = name
+}
+
+func SetDataConverter(converter DataConverter) {
+	dataConverter = converter
+}
+
+func SetContextPropagators(propagators ...ContextPropagator) {
+	contextPropagators = append(contextPropagators, propagators...)
+}
+
 func WorkerRegistry(fn func(w Worker)) {
 	registry = fn
 }
@@ -94,8 +127,13 @@ func createWorker(config *app.ApplicationConfig) (app.Server, error) {
 	}
 
 	dial, err := client.Dial(client.Options{
-		HostPort:  cfg.HostPort,
-		Namespace: cfg.Namespace,
+		HostPort:           cfg.HostPort,
+		Namespace:          cfg.Namespace,
+		Logger:             temporalLogger,
+		MetricsHandler:     metricHandler,
+		Identity:           identity,
+		DataConverter:      dataConverter,
+		ContextPropagators: contextPropagators,
 	})
 
 	if err != nil {

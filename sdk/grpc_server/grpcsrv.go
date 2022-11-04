@@ -2,10 +2,10 @@ package grpc_server
 
 import (
 	"fmt"
+	"github.com/ovargas/wizapp/sdk/app"
+	"github.com/ovargas/wizapp/sdk/logger"
 	"google.golang.org/grpc"
 	"net"
-	"wizapp/sdk/app"
-	"wizapp/sdk/logger"
 )
 
 const (
@@ -15,6 +15,7 @@ const (
 
 type (
 	server struct {
+		app.UnimplementedServer
 		isStarted bool
 		server    *grpc.Server
 		config    *Config

@@ -3,10 +3,10 @@ package dftapp
 import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	"github.com/ovargas/wizapp/sdk/grpc_server"
+	"github.com/ovargas/wizapp/sdk/grpc_server/grpc_gateway_server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"wizapp/sdk/grpc_server"
-	"wizapp/sdk/grpc_server/grpc_gateway_server"
 )
 
 func init() {

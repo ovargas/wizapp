@@ -6,12 +6,22 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"sync"
 	"syscall"
 )
 
 var (
 	mu sync.RWMutex
+
+	Name                   = filepath.Base(os.Args[0])
+	Usage                  = "A wizapp application"
+	UsageText              = ""
+	Description            = ""
+	Copyright              = ""
+	Suggest                = true
+	UseShortOptionHandling = true
+	EnableBashCompletion   = true
 )
 
 type (
@@ -27,6 +37,15 @@ type (
 
 func Run(args []string, setup Setup) error {
 	app := cli.NewApp()
+	app.Name = Name
+	app.Usage = Usage
+	app.UsageText = UsageText
+	app.Description = Description
+	app.Copyright = Copyright
+	app.Suggest = Suggest
+	app.UseShortOptionHandling = UseShortOptionHandling
+	app.EnableBashCompletion = EnableBashCompletion
+
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{
 			Name:    "config-path",
@@ -42,12 +61,6 @@ func Run(args []string, setup Setup) error {
 
 	cfg := Config()
 
-	if err := setup(cfg); err != nil {
-		return err
-	}
-
-	servers := make(map[string]Server)
-
 	components := make(map[string]Component)
 	for k, v := range componentFactories {
 		c, err := v(cfg)
@@ -62,8 +75,7 @@ func Run(args []string, setup Setup) error {
 		Name:   "start",
 		Usage:  "Start registered servers",
 		Flags:  disableServerFlags(),
-		Before: prepare(cfg, servers),
-		Action: start(servers),
+		Action: start(cfg, setup),
 	})
 
 	return app.Run(args)
@@ -82,8 +94,14 @@ func disableServerFlags() []cli.Flag {
 	return disableServerFlags
 }
 
-func prepare(cfg *ApplicationConfig, servers map[string]Server) func(ctx *cli.Context) error {
+func start(cfg *ApplicationConfig, setup Setup) func(ctx *cli.Context) error {
 	return func(ctx *cli.Context) error {
+		if err := setup(cfg); err != nil {
+			return err
+		}
+
+		servers := make(map[string]Server)
+
 		for k, factory := range serverFactories {
 			if ctx.Bool(fmt.Sprintf("disable-%s", k)) {
 				continue
@@ -96,12 +114,6 @@ func prepare(cfg *ApplicationConfig, servers map[string]Server) func(ctx *cli.Co
 			servers[k] = srv
 		}
 
-		return nil
-	}
-}
-
-func start(servers map[string]Server) func(ctx *cli.Context) error {
-	return func(ctx *cli.Context) error {
 		for _, s := range servers {
 			go func(srv Server) {
 				if err := srv.Start(); err != nil {
@@ -110,6 +122,7 @@ func start(servers map[string]Server) func(ctx *cli.Context) error {
 			}(s)
 		}
 		wait(interruptCh(), servers)
+
 		return nil
 	}
 }

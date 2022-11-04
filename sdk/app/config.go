@@ -3,6 +3,7 @@ package app
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -32,14 +33,14 @@ type ApplicationConfig struct {
 	viper *viper.Viper
 }
 
-func LoadApplicationConfig() *ApplicationConfig {
+func LoadApplicationConfig(configPath string) *ApplicationConfig {
 	v := viper.New()
 	v.SetEnvPrefix("")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	v.SetDefault(EnvActiveProfiles, "")
 	v.AutomaticEnv()
 	v.SetConfigType("yaml")
-	loadFile(v)
+	loadFile(v, configPath)
 	loadSpringCloudConfig(v)
 	v.AutomaticEnv()
 	replaceConfigurationVariables(v)
@@ -107,13 +108,17 @@ func replaceConfigurationVariablesInMap(v *viper.Viper, object map[interface{}]i
 }
 
 // loadFile loads the configuration from a file.
-func loadFile(v *viper.Viper) {
-	v.SetDefault(EnvConfigPath, "./resources/")
-	configPath := filepath.Dir(v.GetString(EnvConfigPath))
+func loadFile(v *viper.Viper, configPath string) {
 	v.SetConfigName("application")
 	v.AddConfigPath(configPath)
 	v.AddConfigPath("./config")
 	v.AddConfigPath(".")
+
+	if configPath != "" {
+		configPath = filepath.Dir(v.GetString(configPath))
+		v.AddConfigPath(configPath)
+	}
+
 	err := v.MergeInConfig()
 	if err != nil {
 		fmt.Printf("unable to load config file application.yaml, error: %s\n", err)
@@ -184,7 +189,7 @@ func (c *ApplicationConfig) Get(key string) interface{} {
 
 func Config() *ApplicationConfig {
 	once.Do(func() {
-		applicationConfig = LoadApplicationConfig()
+		applicationConfig = LoadApplicationConfig(os.Getenv(EnvConfigPath))
 	})
 	return applicationConfig
 }

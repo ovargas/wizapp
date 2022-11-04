@@ -2,8 +2,8 @@ package datasource
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/ovargas/wizapp/sdk/app"
 	"time"
-	"wizapp/sdk/app"
 )
 
 type (

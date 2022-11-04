@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package wizapp.items.v1;
+
+option go_package = "github.com/ovargas/wizapp/example/api/items/v1;itemsV1";
+
+
+message Item {
+  string id = 1;
+  string name = 2;
+}

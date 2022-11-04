@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"wizapp/api/items/v1"
+	itemsV1 "github.com/ovargas/wizapp/example/api/items/v1"
 )
 
 type Item struct {

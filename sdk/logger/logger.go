@@ -1,8 +1,7 @@
 package logger
 
 import (
-	"io"
-	"wizapp/sdk/app"
+	"github.com/ovargas/wizapp/sdk/app"
 
 	"github.com/sirupsen/logrus"
 )
@@ -20,8 +19,6 @@ type (
 		Level string `mapstructure:"level"`
 		// The formatter to use (default: text, options: text, json, stackdriver).
 		Formatter string `mapstructure:"formatter"`
-		// The output to use (default: stdout, options: stdout, stderr, file).
-		Output io.Writer `mapstructure:"output"`
 	}
 )
 
@@ -49,7 +46,6 @@ func init() {
 	if defaultLogger {
 		logger.Debug("No logger configuration found. Using default logger.")
 	}
-	logger.WithFields(map[string]interface{}{"formatter": cfg.Formatter, "level": cfg.Level}).Info("Logger configured")
 }
 
 // setupLogger creates a new logrus.Logger with the given configuration
@@ -60,10 +56,6 @@ func setupLogger(cfg *Config) Logger {
 	}
 
 	l.SetReportCaller(false)
-
-	if cfg.Output != nil {
-		l.SetOutput(cfg.Output)
-	}
 
 	switch cfg.Formatter {
 	case "stackdriver":
@@ -89,7 +81,6 @@ func ConfigureLogger(cfg *Config) {
 // You can use it in your app or library by simply calling it.
 // Example:
 //
-//	import "gitlab.com/akordacorp/go-commons/logger"
 //	logger.Log().Info("Hello World")"
 func Log() Logger {
 	return logger
